@@ -143,7 +143,7 @@ def img_to_base64(img):
     return img_str
 
 # Carica immagine
-logo = Image.open("/workspaces/HeadSafe-1-0/logo.png")
+logo = Image.open("logo.png")
 logo_base64 = img_to_base64(logo)
 
 # Mostra immagine centrata e grande (es. 600px)
