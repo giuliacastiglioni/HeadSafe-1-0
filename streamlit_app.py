@@ -307,12 +307,6 @@ if uploaded_file:
         ax3.legend()
         st.pyplot(fig3)
 
-        # Heatmap accelerazioni con zoom
-        st.subheader("Heatmap accelerazioni")
-        fig4, ax4 = plt.subplots(figsize=(12,2))
-        sns.heatmap(df[['ax','ay','az']], cmap="RdYlBu_r", cbar=True, ax=ax4)
-        st.pyplot(fig4)
-
         # Statistiche giroscopio
         st.subheader("Statistiche giroscopio")
         st.dataframe(df[['gx','gy','gz','gyroMagnitude']].describe())
@@ -354,13 +348,6 @@ if uploaded_file:
             st.metric("Rotazione Media (°/s)", f"{mean_gyr:.2f}")
         st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="section-box">', unsafe_allow_html=True)
-        st.subheader("Heatmap Accelerazioni")
-        fig1, ax1 = plt.subplots(figsize=(10, 2))
-        sns.heatmap(df[['ax', 'ay', 'az']], cmap='coolwarm', cbar=True, ax=ax1)
-        st.pyplot(fig1)
-        st.markdown("Questa heatmap mostra le accelerazioni sugli assi X, Y e Z durante la sessione. Le aree di colore più intenso indicano momenti di maggiore attività o impatti.")
-        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="section-box">', unsafe_allow_html=True)
         st.subheader("Andamento Magnitudo Impatti")
