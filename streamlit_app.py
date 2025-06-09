@@ -138,12 +138,12 @@ from io import BytesIO
 # Funzione per convertire immagine in base64
 def img_to_base64(img):
     buffered = BytesIO()
-    img.save(buffered, format="PNG")
+    img.save(buffered, format="png")
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return img_str
 
 # Carica immagine
-logo = Image.open("/workspaces/HeadSafe-1-0/logo.PNG")
+logo = Image.open("/workspaces/HeadSafe-1-0/logo.png")
 logo_base64 = img_to_base64(logo)
 
 # Mostra immagine centrata e grande (es. 600px)
