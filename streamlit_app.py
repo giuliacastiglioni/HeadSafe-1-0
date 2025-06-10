@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
+import plotly.graph_objects as go
+import plotly.subplots as sp
 
 st.set_page_config(layout="wide", page_title="HEADSAFE Dashboard")
 
@@ -36,14 +38,24 @@ st.markdown(f"""
 
 body {{
     font-family: 'Roboto', sans-serif;
-    background-color: {CIPRIA};
-    color: {CIPRIA};
+    background-color: #000000;
+    color: #e8d8c3;
     padding: 1rem 2rem;
 }}
 
-h1, h2, h3, h4 {{
-    font-weight: 700;
-    color: {CIPRIA};
+/* Titoli e sottotitoli */
+h1, h2, h3, h4, h5, h6 {{
+    color: #e8d8c3 !important;
+}}
+
+/* Testo generico */
+p, .markdown-text-container, .stMarkdown, .css-1cpxqw2, .css-10trblm {{
+    color: #e8d8c3 !important;
+}}
+
+/* Label sopra input e metriche */
+label {{
+    color: #e8d8c3 !important;
 }}
 
 .stButton>button {{
@@ -130,6 +142,7 @@ header h1 {{
 
 </style>
 """, unsafe_allow_html=True)
+
 
 from PIL import Image
 import base64
@@ -278,44 +291,66 @@ if uploaded_file:
 
         # Istogrammi distribuzione accelerazioni
         st.subheader("Distribuzione accelerazioni (ax, ay, az)")
-        fig, axs = plt.subplots(1, 3, figsize=(15, 4))
-        sns.histplot(df['ax'], bins=30, color='red', kde=True, ax=axs[0])
-        axs[0].set_title('Ax')
-        sns.histplot(df['ay'], bins=30, color='green', kde=True, ax=axs[1])
-        axs[1].set_title('Ay')
-        sns.histplot(df['az'], bins=30, color='blue', kde=True, ax=axs[2])
-        axs[2].set_title('Az')
-        st.pyplot(fig)
+
+        fig = sp.make_subplots(rows=1, cols=3, subplot_titles=["Ax", "Ay", "Az"])
+
+        fig.add_trace(go.Histogram(x=df['ax'], nbinsx=30, marker_color='red', name='Ax'), row=1, col=1)
+        fig.add_trace(go.Histogram(x=df['ay'], nbinsx=30, marker_color='green', name='Ay'), row=1, col=2)
+        fig.add_trace(go.Histogram(x=df['az'], nbinsx=30, marker_color='blue', name='Az'), row=1, col=3)
+
+        fig.update_layout(title="Distribuzione accelerazioni (ax, ay, az)",
+                          plot_bgcolor='black',
+                          paper_bgcolor='black',
+                          #font=dict(color='white'),
+                          xaxis_title="Accelerazione (g)",
+                          yaxis_title="Frequenza",
+                          showlegend=True)
+        st.plotly_chart(fig, use_container_width=True)
+
 
         # Boxplot accelerazioni
         st.subheader("Boxplot accelerazioni")
-        fig2, ax2 = plt.subplots()
-        sns.boxplot(data=df[['ax', 'ay', 'az']], ax=ax2)
-        st.pyplot(fig2)
+        fig = go.Figure()
+        for col, color in zip(['ax', 'ay', 'az'], ['red', 'green', 'blue']):
+            fig.add_trace(go.Box(y=df[col], name=col, marker_color=color))
+
+        fig.update_layout(title="Boxplot accelerazioni",
+                          plot_bgcolor='black',
+                          paper_bgcolor='black')
+        st.plotly_chart(fig, use_container_width=True)
+
 
         # Time series con segnali di impatto evidenziati
         st.subheader("Andamento temporale accelerazioni con picchi di impatto")
-        fig3, ax3 = plt.subplots(figsize=(12,4))
-        df['accMagnitude'].plot(ax=ax3, label='Accelerazione Magnitudo', color='black')
-
-        # Evidenzia punti oltre soglia alta
         alto_rischio = df[df['accMagnitude'] > soglia_alto]
-        ax3.scatter(alto_rischio.index, alto_rischio['accMagnitude'], color=ROSSO, label='Impatto alto rischio')
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=df['accMagnitude'], mode='lines', name='Acc Magnitude', line=dict(color='lightyellow')))
 
-        ax3.set_xlabel("Campioni temporali")
-        ax3.set_ylabel("Accelerazione (g)")
-        ax3.legend()
-        st.pyplot(fig3)
+        fig.add_trace(go.Scatter(
+            x=alto_rischio.index,
+            y=alto_rischio['accMagnitude'],
+            mode='markers',
+            marker=dict(color=ROSSO, size=8),
+            name='Impatto alto rischio'
+        ))
+
+        fig.update_layout(title="Andamento temporale accelerazioni con picchi di impatto",
+                        plot_bgcolor='black',
+                        paper_bgcolor='black',
+                        xaxis_title="Campioni", yaxis_title="Accelerazione (g)")
+        st.plotly_chart(fig, use_container_width=True)
+
 
         # Statistiche giroscopio
         st.subheader("Statistiche giroscopio")
         st.dataframe(df[['gx','gy','gz','gyroMagnitude']].describe())
 
         # Istogramma giroscopio
-        st.subheader("Distribuzione magnitudo giroscopio")
-        fig5, ax5 = plt.subplots()
-        sns.histplot(df['gyroMagnitude'], bins=30, kde=True, color='purple', ax=ax5)
-        st.pyplot(fig5)
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=df['gyroMagnitude'], nbinsx=30, marker_color='purple'))
+        fig.update_layout(title="Distribuzione magnitudo giroscopio", xaxis_title="Magnitudo", yaxis_title="Frequenza",plot_bgcolor='black',
+                          paper_bgcolor='black')
+        st.plotly_chart(fig, use_container_width=True)
 
         # Alert automatici
         if num_alto > 0:
@@ -351,13 +386,14 @@ if uploaded_file:
 
         st.markdown('<div class="section-box">', unsafe_allow_html=True)
         st.subheader("Andamento Magnitudo Impatti")
-        fig2, ax2 = plt.subplots()
-        df[['accMagnitude', 'gyroMagnitude']].plot(ax=ax2)
-        ax2.set_title("Andamento Magnitudo Impatti")
-        ax2.set_xlabel("Campioni")
-        ax2.set_ylabel("Magnitudo")
-        st.pyplot(fig2)
-        st.markdown('</div>', unsafe_allow_html=True)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=df['accMagnitude'], mode='lines', name='Acc Magnitude'))
+        fig.add_trace(go.Scatter(y=df['gyroMagnitude'], mode='lines', name='Gyro Magnitude'))
+
+        fig.update_layout(title="Andamento Magnitudo Impatti", xaxis_title="Campioni", yaxis_title="Magnitudo",plot_bgcolor='black',
+                          paper_bgcolor='black')
+        st.plotly_chart(fig, use_container_width=True)
+
 
         st.markdown('<div class="section-box">', unsafe_allow_html=True)
         st.subheader("Valutazione rischio impatto")
