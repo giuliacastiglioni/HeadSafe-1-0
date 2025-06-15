@@ -384,15 +384,15 @@ if uploaded_file:
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-        st.markdown('<div class="section-box">', unsafe_allow_html=True)
-        st.subheader("Andamento Magnitudo Impatti")
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(y=df['accMagnitude'], mode='lines', name='Acc Magnitude'))
-        fig.add_trace(go.Scatter(y=df['gyroMagnitude'], mode='lines', name='Gyro Magnitude'))
+#        st.markdown('<div class="section-box">', unsafe_allow_html=True)
+#        st.subheader("Andamento Magnitudo Impatti")
+#        fig = go.Figure()
+#        fig.add_trace(go.Scatter(y=df['accMagnitude'], mode='lines', name='Acc Magnitude'))
+#        fig.add_trace(go.Scatter(y=df['gyroMagnitude'], mode='lines', name='Gyro Magnitude'))
 
-        fig.update_layout(title="Andamento Magnitudo Impatti", xaxis_title="Campioni", yaxis_title="Magnitudo",plot_bgcolor='black',
-                          paper_bgcolor='black')
-        st.plotly_chart(fig, use_container_width=True)
+#        fig.update_layout(title="Andamento Magnitudo Impatti", xaxis_title="Campioni", yaxis_title="Magnitudo",plot_bgcolor='black',
+#                          paper_bgcolor='black')
+#        st.plotly_chart(fig, use_container_width=True)
 
 
         st.markdown('<div class="section-box">', unsafe_allow_html=True)
